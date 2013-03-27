@@ -1,0 +1,5 @@
+build/*
+MANIFEST
+dist/*
+*.pyc
+source/debug/*
