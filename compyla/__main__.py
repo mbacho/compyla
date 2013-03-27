@@ -46,14 +46,13 @@ def main(fpath):
   pre = PreProcessor()
   a,b=split(fpath)
   src_fyl = pre.format_file(b,a)
-  print "Done..."
   
-  #print "Lexical analysis"
-  #la = lex.LexAnalyser()
-  #output = la.analyse(src_fyl)
-  #if not output:
-  #  print "lexial error"
-  #  exit(1)
+  print "Lexical analysis..."
+  la = lex.LexAnalyser()
+  output = la.analyse(src_fyl)
+  if not output:
+    print "lexial error"
+    exit(1)
     
   #print "Parsing..."
   #fsm = FxnFSM()
