@@ -31,9 +31,9 @@ class State(object):
     def trans_for(self, token, tos):
         print 'match (', token, ',', tos, ')'
         for i in self.fxns:
-            if (i.token.lower() == token.lower() or i.token == Fxn.ANY_INPT) and i.tos == tos:
+            if (i.token.lower() == token.lower() or i.token == Fxn.ANY_INPT) and (i.tos == tos):
                 print i.__repr__()
-                return i
+                return i            
         return None
 
     def __repr__(self):
@@ -114,21 +114,25 @@ class Pda(object):
         while cur_tok < size:
             i = s[cur_tok]
             print '\n', self.stack
+            #print 'remaining', s[cur_tok:]
             tos = self.stack.pop()
             trans = cur_state.trans_for(i.lex_id, tos)
             if trans is None:
                 raise ParseException("No transition found for {0} in state {1}".format(i.lex_id, cur_state.name),i)
 
             nxt_state, pushes = trans.replacements
-            if len(pushes) == 0:
-                cur_tok += 1
-
+            
             rev = reversed(pushes) #list.reverse mutates the list :(
             for j in rev:
                 self.stack.push(j)
-            cur_state = nxt_state
-
+            cur_state = nxt_state            
+            
+            if len(pushes) == 0:
+              if tos[0].islower(): #if is terminal
+                cur_tok += 1
+              
         if not self.stack.is_empty():
+            print self.stack
             raise ParseException("PDA terminated with non-empty stack")
 
         print "parse ok"

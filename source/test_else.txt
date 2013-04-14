@@ -1,7 +1,0 @@
-funcion(){
-  if('as'!='w')then{
-    a = b + c;
-  }else{
-    f = d + e;
-  }
-}

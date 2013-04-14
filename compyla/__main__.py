@@ -8,6 +8,7 @@ from os.path import realpath
 from os.path import isabs
 from os import mkdir
 from os import chdir
+from os import remove
 from shutil import copy2
 
 from sys import exit
@@ -17,7 +18,7 @@ from lexical import lex_analyser as lex
 from lexical.fomata import PreProcessor
 from synt_an import FxnPda
 from synt_an import ParseException
-from synt_an import fxn_lang_load
+from synt_an import load_complex
 from synt_an import load_simple
 
 DEBUG_FOLDER = "debug/"
@@ -35,14 +36,27 @@ def enter_debug(fpath):
     chdir(DEBUG_FOLDER)
     return name
 
+    
+def lookup(sym_file,lexeme):
+  fyl = open(sym_file,'r')
+  code,id,lex = None,None,None
+  for line in fyl:
+      if line.startswith("{0} {1}".format(lexeme.lex_id,lexeme.lex_code)):
+        code,id,lex = line.split()
+  fyl.close()      
+  if lex is None:
+      return lexeme.lex_id
+  else:
+      return lex
 
+  
 def main(fpath):
     """Needs the file's absolute path"""
     if not isabs(fpath):
         print "',", fpath, "' is not an absolute file path"
         exit(1)
     fname = enter_debug(fpath)
-
+    
     print "formating src..."
     pre = PreProcessor()
     a, b = split(fpath)
@@ -57,9 +71,10 @@ def main(fpath):
 
     print "Parsing..."
     pda = FxnPda()
-    #fxn_lang_load(pda)
-    load_simple(pda)
 
+    #load_simple(pda)
+    load_complex(pda)
+    
     try:
         pda.parse_lexemes(output[0])
         pass
@@ -68,7 +83,7 @@ def main(fpath):
         if lexeme is None:
             print e.message
         else:
-            print "Unexpected token {0} in line {1}".format(lexeme.lex_id, lexeme.line_no)
+            print "Unexpected token '{0}' in line {1}".format(lookup(output[1],lexeme), lexeme.line_no)
 
 
 def usage():

@@ -30,6 +30,7 @@ class PreProcessor(object):
     Replace hexadecimal numbers with integers   
   """  
   MACROS   = {}#key - value dictionary
+  INCLUDES = [] #filenames of already included files. doesn't handle recursive includes :(
   PRE_FOLDER = 'pre/' #preformatted code stored here
   CUR_LINE = None
   CUR_SRC = None
@@ -44,7 +45,7 @@ class PreProcessor(object):
     return ln 
     
   def include(self, line, base_dir):
-    """Process included file then return formated filename"""
+    """Process included file then return formated filename if not yet included, None otherwise."""
     name = line.strip().split('<')
     if len(name) != 2:
       raise PreProcException("Invalid include in line {0} in {1}".format(self.CUR_LINE,self.CUR_SRC))
@@ -71,12 +72,14 @@ class PreProcessor(object):
     fullnm = join(base_dir,nm)
     if not exists(fullnm):
       raise PreProcException("Include file not found. Line {0} in {1}".format(self.CUR_LINE,self.CUR_SRC))
+    if fullnm not in self.INCLUDES: #check if file is already included
+      self.INCLUDES.append(fullnm)
+      copy2(fullnm,'.')
+      frmt = PreProcessor()
+      fname = frmt.format_file(nm,base_dir)
+      return fname
+    return None
     
-    copy2(fullnm,'.')
-    frmt = PreProcessor()
-    fname = frmt.format_file(nm,base_dir)
-    return fname
-        
   def define(self,line):
     """
     Process macros in source.
@@ -107,13 +110,12 @@ class PreProcessor(object):
       chdir(base_dir)
       
     src = open(name, 'r+')
-    self.CUR_SRC = name
-    lines = src.readlines() #potential memory hogger
+    self.CUR_SRC = name    
 
     des = open(name+'.src','w+')
     self.IN_BLOCK_COMM = False
     self.CUR_LINE = 0
-    for line in lines:
+    for line in src:
       self.CUR_LINE += 1
       line = line.strip()
       write_line = ''
@@ -136,6 +138,7 @@ class PreProcessor(object):
 
       if line.startswith('#include'):
         fname = self.include(line,base_dir)
+        if fname == None: continue #already included
         f = open(fname,'r')
         for i in f:
           des.write(i)

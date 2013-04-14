@@ -1,1 +1,0 @@
-testfxn(){if(right<=left)then{men=women+children;}else if(now==thn)then{opinion=ails+bils;}else{cats=dogs+cows;}if(cats<dogs)then{cows=rats+mice;}}

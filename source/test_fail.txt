@@ -1,9 +1,0 @@
-
-//my progi
-
-function (){
-  if(s==f)then
-  { //no then
-    'ss' = (a+b);
-  }
-}
