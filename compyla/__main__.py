@@ -18,6 +18,7 @@ from lexical.fomata import PreProcessor
 from synt_an import FxnPda
 from synt_an import ParseException
 from synt_an import fxn_lang_load
+from synt_an import load_simple
 
 DEBUG_FOLDER = "debug/"
 
@@ -55,15 +56,19 @@ def main(fpath):
         exit(1)
 
     print "Parsing..."
-    fsm = FxnPda()
-    fxn_lang_load(fsm)
+    pda = FxnPda()
+    #fxn_lang_load(pda)
+    load_simple(pda)
 
     try:
-        #fsm.parse_lexemes(output[0])
+        pda.parse_lexemes(output[0])
         pass
     except ParseException, e:
         lexeme = e.lexeme
-        print "Unexpected token {0} in line {1}".format(lexeme.lex_id, lexeme.line_no)
+        if lexeme is None:
+            print e.message
+        else:
+            print "Unexpected token {0} in line {1}".format(lexeme.lex_id, lexeme.line_no)
 
 
 def usage():

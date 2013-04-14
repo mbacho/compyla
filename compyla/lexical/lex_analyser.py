@@ -25,7 +25,13 @@ class LexAnalyser(object):
     CHAR_TYPE_QUOTE = 6
 
     #recognize signed integers
-
+    #TODO find out why spaces are needed btn operators 
+    # e.g. a=b+c 
+    #      gives id id plus id omitting the assign
+    #     a = b + c
+    #      gives id assign id plus id
+    #
+    
     LEXEME_LIST = []  #list of lexemes
     SYMBOL_TABLE = [
         TokenObject(token_code=1001, token_id='ifTok', token_lex='if'),
@@ -55,7 +61,7 @@ class LexAnalyser(object):
 
     ALPHAS = ['_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
               'u', 'v', 'w', 'x', 'y', 'z']
-    SPECS = ['=', '+', '-', '*', '/', '<', '>', '(', ')', '}', '{', ';','.']
+    SPECS = ['+', '-', '*', '/', '(', ')', '}', '{', ';', '.', '%']
     SPEC_FOLLOW = ['=', '!', '<', '>'] #cater for '==','<=','>=','!='
     WHITE_SPACE = [' ', '\n', '\t']
     NUMBERS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
@@ -148,7 +154,7 @@ class LexAnalyser(object):
         cur_str = ""  #string & character buffer
         cur_num = ""  #number & floats buffer
         cur_word = "" #identifier buffer
-        cur_spec_fol = ""
+        cur_spec = ""
 
         ch = fyl.read(1)
         self.CUR_LINE_NO = 1
@@ -228,11 +234,11 @@ class LexAnalyser(object):
                 if ch != '.': self.process_spec(ch)
 
             elif ch_type == self.CHAR_TYPE_SPEC_FOLLOW:
+                #print "spec = '{0}' cur_spec='{1}'".format(ch,cur_spec)
                 if self.READING_WORD:
                     self.process_identifier(cur_word)
                     self.READING_WORD = False
                     cur_word = ''
-
                 elif self.READING_STR or self.READING_CHR:
                     cur_str += ch
                 elif self.get_read_spec() and ch == '=' and len(cur_spec) == 1:
@@ -253,9 +259,8 @@ class LexAnalyser(object):
                     self.process_flt(cur_num)
                     self.READING_FLT = False
                     cur_num = ''
-                
                 else:
-                    cur_spec = ch
+                    cur_spec += ch
                     self.set_read_spec(True)
 
             elif ch_type == self.CHAR_TYPE_NUMBER:
@@ -267,9 +272,8 @@ class LexAnalyser(object):
                     self.process_spec(ch)
                     self.set_read_spec(False)
                 elif self.READING_NUM or self.READING_FLT:
-                  cur_num += ch
-                
-                elif not self.READING_WORD and not self.READING_STR:
+                  cur_num += ch                
+                else:
                     self.READING_NUM = True
                     cur_num += ch
 
@@ -322,7 +326,7 @@ class LexAnalyser(object):
                             self.READING_NUM,self.READING_FLT,cur_num,
                             self.READING_STR,self.READING_CHR,cur_str,
                             self.READING_WORD,cur_word,
-                            self.READING_SPEC,cur_spec_fol
+                            self.READING_SPEC,cur_spec
                             )
                     iko_poa = False
                     break

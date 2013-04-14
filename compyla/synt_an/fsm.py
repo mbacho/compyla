@@ -44,11 +44,11 @@ class State(object):
 
 
 class ParseException(BaseException):
-    def __init__(self, lexeme, msg):
+    def __init__(self,msg,lexeme=None):
         self.lexeme = lexeme
         super(ParseException, self).__init__(msg)
 
-
+        
 class Stack():
     """Simple stack implementation"""
     STACK_INIT = '$'
@@ -89,9 +89,9 @@ class Stack():
             return None
 
     def is_empty(self):
-        return self.__len__() == 1
+        return self.__len__() <= 0
 
-
+        
 class Pda(object):
     def __init__(self):
         self.stack = Stack()
@@ -109,7 +109,6 @@ class Pda(object):
         if cur_state is None:
             raise ParseException("No start state provided")
 
-        self.stack.push('Function')
         size = len(s)
         cur_tok = 0
         while cur_tok < size:
@@ -118,15 +117,14 @@ class Pda(object):
             tos = self.stack.pop()
             trans = cur_state.trans_for(i.lex_id, tos)
             if trans is None:
-                raise ParseException(i, "No transition found for {0} in state {1}".format(i.lex_id, cur_state.name))
+                raise ParseException("No transition found for {0} in state {1}".format(i.lex_id, cur_state.name),i)
 
             nxt_state, pushes = trans.replacements
             if len(pushes) == 0:
                 cur_tok += 1
 
-            pushes.reverse()
-
-            for j in pushes:
+            rev = reversed(pushes) #list.reverse mutates the list :(
+            for j in rev:
                 self.stack.push(j)
             cur_state = nxt_state
 
