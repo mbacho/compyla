@@ -1,0 +1,19 @@
+/*
+macro definitions here
+*/
+#define MAX  0x33+0x443;
+/*
+included files here
+*/
+//#include <simple.txt>
+/*
+function definition
+*/
+funcion(){
+  if("string \"0x354"!='\'')then{
+    a = 0x34 + 3.4;//no prob
+    b = .4 + 4.;
+    c = '"' + "'";
+  }
+  #MAX
+}
