@@ -1,9 +1,0 @@
-#include    <source.txt> //inline
-#define MAX 12+13
-testfxn 
-(//inline comment
-)/*multiline
-comment
-*/{
-#MAX
-}
